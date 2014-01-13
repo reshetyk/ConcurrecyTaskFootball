@@ -1,5 +1,7 @@
 package football;
 
+import sun.net.www.content.audio.basic;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +23,15 @@ public class Player implements Observable, Drawable {
     }
 
     public void hitBall(Ball ball, int x, int y) {
-//        final int outRangeValue = 1;
-//        Random random = new Random();
-        //TODO: gets a field size
-//        int randomX = random.nextInt(20 + outRangeValue) + 1;
-//        int randomY = random.nextInt(20 + outRangeValue) + 1;
-
         ball.setLocation(x, y);
-
+        notifyObservers();
+    }
+    public void hitBallRandom(Field field) {
+        final int outRangeValue = 1;
+        Random random = new Random();
+        int randomX = random.nextInt(field.getWidth() + outRangeValue) + 1;
+        int randomY = random.nextInt(field.getHeight() + outRangeValue) + 1;
+        field.getBall().setLocation(randomX, randomY);
         notifyObservers();
     }
 
@@ -94,7 +97,7 @@ public class Player implements Observable, Drawable {
     @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
-            observer.onBallHit();
+            observer.onBallHit(this);
         }
     }
 

@@ -9,6 +9,9 @@ public class Ball implements Drawable {
     private int playerOwnerId;
     private Point point = new Point();
 
+    public Ball() {
+    }
+
     public Ball(int x, int y) {
         setLocation(x, y);
     }
@@ -50,7 +53,7 @@ public class Ball implements Drawable {
     public String toString() {
         return "Ball{" +
                 "playerOwnerId=" + playerOwnerId +
-                ", in position=[x=" + point.x + ", y" + point.y + "]" +
+                ", in position=[x=" + point.x + ", y=" + point.y + "]" +
                 '}';
     }
 }

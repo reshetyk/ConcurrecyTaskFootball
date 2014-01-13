@@ -4,5 +4,5 @@ package football;
  * @author Alexey
  */
 public interface Observer {
-    void onBallHit();
+    void onBallHit(Observable observable);
 }
