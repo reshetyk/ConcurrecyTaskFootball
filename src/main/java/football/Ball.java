@@ -6,14 +6,10 @@ import java.awt.*;
  * @author Alexey
  */
 public class Ball implements Drawable {
-    private int playerOwnerId;
-    private Point point = new Point();
+    private int playerOwnerId = -1;
+    private final Point point = new Point();
 
     public Ball() {
-    }
-
-    public Ball(int x, int y) {
-        setLocation(x, y);
     }
 
     @Override

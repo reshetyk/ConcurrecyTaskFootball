@@ -1,38 +1,63 @@
 package football;
 
-import sun.net.www.content.audio.basic;
-
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * @author Alexey
  */
-public class Player implements Observable, Drawable {
-    private final List<Observer> observers = new ArrayList<Observer>();
-    private String name;
-    private int id;
+public class Player implements Drawable, Runnable {
+    private final String name;
+    private final int id;
     private Point point = new Point();
+    private final Referee referee;
+    private final Field field;
 
-    public Player(String name, int id, Point point) {
+
+    public Player(String name, int id, Point point, Field field, Referee referee) {
         this.name = name;
         this.id = id;
         this.point = point;
+        this.field = field;
+        this.referee = referee;
     }
 
-    public void hitBall(Ball ball, int x, int y) {
-        ball.setLocation(x, y);
-        notifyObservers();
+    @Override
+    public void run() {
+        synchronized (field.getBall()) {
+            while (!referee.isOverGame()) {
+                if (referee.canPlayerHitBall() &&  field.getBall().getPlayerOwnerId() == this.id) {
+                    hitBallRandom();
+                    referee.setCanPlayerHitBall(false);
+                    field.getBall().notifyAll();
+                } else {
+                    try {
+                        field.getBall().wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
-    public void hitBallRandom(Field field) {
+
+    public void hitBallRandom() {
+        final Ball ball = field.getBall();
         final int outRangeValue = 1;
         Random random = new Random();
         int randomX = random.nextInt(field.getWidth() + outRangeValue) + 1;
         int randomY = random.nextInt(field.getHeight() + outRangeValue) + 1;
-        field.getBall().setLocation(randomX, randomY);
-        notifyObservers();
+        ball.setLocation(randomX, randomY);
+        referee.broadcast(this.toString() + " hit the ball to [X=" + ball.getX() + ", Y=" + ball.getY() + "]");
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", in position=[x=" + point.x + ", y=" + point.y + "]" +
+                '}';
     }
 
     @Override
@@ -60,53 +85,7 @@ public class Player implements Observable, Drawable {
         return point.distance(x, y);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Point getPoint() {
-        return point;
-    }
-
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
-    @Override
-    public void registerObserver(Observer observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void removeObserver(Observer observer) {
-        observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers() {
-        for (Observer observer : observers) {
-            observer.onBallHit(this);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Player{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", in position=[x=" + point.x + ", y=" + point.y + "]" +
-                '}';
     }
 }
