@@ -24,21 +24,14 @@ public class Player implements Drawable, Runnable {
 
     @Override
     public void run() {
-        synchronized (field.getBall()) {
             while (!referee.isOverGame()) {
                 if (referee.canPlayerHitBall() &&  field.getBall().getPlayerOwnerId() == this.id) {
+                    field.getBall().lock();
                     hitBallRandom();
                     referee.setCanPlayerHitBall(false);
-                    field.getBall().notifyAll();
-                } else {
-                    try {
-                        field.getBall().wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    field.getBall().unlock();
                 }
             }
-        }
     }
 
     public void hitBallRandom() {

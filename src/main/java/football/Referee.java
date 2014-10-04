@@ -22,22 +22,15 @@ public class Referee implements Runnable {
 
     @Override
     public void run() {
-        synchronized (field.getBall()) {
-            while (isBallWithinField()) {
-                if (!canPlayerHitBall) {
-                    defineAndSetBallOwner();
-                    field.getBall().notifyAll();
-                } else {
-                    try {
-                        field.getBall().wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        while (isBallWithinField()) {
+            if (!canPlayerHitBall) {
+                field.getBall().lock();
+                defineAndSetBallOwner();
+                field.getBall().unlock();
             }
-            broadcast(field.getBall() + " outside!");
-            broadcast("game over!");
         }
+        broadcast(field.getBall() + " outside!");
+        broadcast("game over!");
     }
 
     public void defineAndSetBallOwner() {
@@ -98,7 +91,6 @@ public class Referee implements Runnable {
     public boolean isOverGame() {
         return !isBallWithinField();
     }
-
 
     public boolean canPlayerHitBall() {
         return canPlayerHitBall;

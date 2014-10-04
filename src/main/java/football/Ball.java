@@ -1,15 +1,28 @@
 package football;
 
 import java.awt.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Alexey
  */
 public class Ball implements Drawable {
+    private final static Lock LOCK = new ReentrantLock();
     private int playerOwnerId = -1;
     private final Point point = new Point();
 
     public Ball() {
+    }
+
+    public void lock() {
+//        System.out.println("Locked by " + Thread.currentThread().getName());
+        LOCK.lock();
+    }
+
+    public void unlock() {
+        LOCK.unlock();
+//        System.out.println("Unlocked by " + Thread.currentThread().getName());
     }
 
     @Override
